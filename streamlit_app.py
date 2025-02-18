@@ -13,7 +13,6 @@ Specifically:
 - Identify the number of main components (e.g., main dish, side dishes, garnishes).
 - Describe each component in detail, including its type, estimated quantity, and notable ingredients.
 """
-
 NUTRITION_INFO_PROMPT_TEMPLATE = """
 Provide a detailed TOTAL nutritional breakdown for the ENTIRE dish described below. 
 Include ONLY the total values for macronutrients like calories, carbohydrates, fats, proteins, etc.
@@ -25,11 +24,11 @@ def encode_image_to_base64(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
 
-def extract_food_info(image_path):
+def extract_food_info(image_path, api_key):
     base64_image = encode_image_to_base64(image_path)
     url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
-        "Authorization": "Bearer " + st.secrets["api"]["API_KEY"],
+        "Authorization": "Bearer " + api_key,
         "Content-Type": "application/json",
     }
     data = {
@@ -59,10 +58,10 @@ def extract_food_info(image_path):
     else:
         return f"Error: {response.status_code}"
 
-def extract_nutrition_info(text):
+def extract_nutrition_info(text, api_key):
     url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
-        "Authorization": "Bearer " + st.secrets["api"]["API_KEY"],
+        "Authorization": "Bearer " + api_key,
         "Content-Type": "application/json",
     }
     data = {
@@ -94,8 +93,14 @@ def add_text_to_image(image_path, text):
 
 # Streamlit App
 st.title("Food Information Extractor")
-uploaded_file = st.file_uploader("Choose an image...", type="jpg")
 
+# Input for API Key
+api_key = st.text_input("Enter your OpenRouter API Key:", type="password")
+if not api_key:
+    st.warning("Please enter your API Key to proceed.")
+    st.stop()
+
+uploaded_file = st.file_uploader("Choose an image...", type="jpg")
 if uploaded_file is not None:
     image_path = "uploaded_image.jpg"
     with open(image_path, "wb") as f:
@@ -105,10 +110,10 @@ if uploaded_file is not None:
     st.write("")
     st.write("Extracting food information...")
     
-    food_info = extract_food_info(image_path)
+    food_info = extract_food_info(image_path, api_key)
     st.write("Food Information:")
     st.write(food_info)
     
-    nutrition_info = extract_nutrition_info(food_info)
+    nutrition_info = extract_nutrition_info(food_info, api_key)
     st.write("Nutrition Information:")
     st.write(nutrition_info)
