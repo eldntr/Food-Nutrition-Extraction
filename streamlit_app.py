@@ -9,11 +9,15 @@ import os
 FOOD_INFO_PROMPT_TEMPLATE = """
 Extract only the food-related information from this image. 
 Focus on identifying the main ingredients, portion size, and any other relevant details about the food.
+Specifically:
+- Identify the number of main components (e.g., main dish, side dishes, garnishes).
+- Describe each component in detail, including its type, estimated quantity, and notable ingredients.
 """
 
 NUTRITION_INFO_PROMPT_TEMPLATE = """
-Provide a detailed nutritional breakdown for the food item described. 
-Include both per-serving (slice) information and the total nutritional content for the entire dish. Ensure the output is clear and well-organized, with separate sections for macronutrients like calories, carbohydrates, fats, proteins, etc: 
+Provide a detailed TOTAL nutritional breakdown for the ENTIRE dish described below. 
+Include ONLY the total values for macronutrients like calories, carbohydrates, fats, proteins, etc.
+Do not include per-serving information. Ensure the output is clear, concise, and well-organized.
 {text}
 """
 
